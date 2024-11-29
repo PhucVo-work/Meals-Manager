@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:meals_manager/constants/images_path.dart';
+import 'package:meals_manager/screens/home.dart';
 
 class OnBoardingScreen extends StatelessWidget {
   const OnBoardingScreen({super.key});
@@ -60,7 +61,7 @@ class OnBoardingScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     const Text(
-                      'MEAL MANAGER',
+                      'Food Recipe',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 34,
@@ -69,7 +70,7 @@ class OnBoardingScreen extends StatelessWidget {
                     SizedBox(height: h * .015,),
                     const Center(
                       child: Text(
-                        'Manage your meals with over 100 recipes \n from diverse countries and cultures \n around the world.',
+                        'Provide over 100 recipes from diverse \n countries and cultures around \n the world.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
@@ -120,7 +121,12 @@ class OnBoardingScreen extends StatelessWidget {
                         width: w * .9,
                         height: h * .06,
                         child: OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context)=> const Home()),
+                            );
+                          },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Color(0xFF8A47EB), width: 2),
                             backgroundColor: Colors.transparent,
