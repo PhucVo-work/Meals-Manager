@@ -180,7 +180,7 @@ class OnBoardingScreen extends StatelessWidget {
                             )
                           ),
                           child: const Text(
-                            'Sign up with google',
+                            'Log in with google',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -192,14 +192,14 @@ class OnBoardingScreen extends StatelessWidget {
                       SizedBox(
                         child: RichText(
                           text: TextSpan(
-                            text: "Already have account? ",
+                            text: "Create a new acount? ",
                             style: const TextStyle(
                               color: Colors.black,
                               fontSize: 16,
                             ),
                             children: [
                               TextSpan(
-                                text: "Log In",
+                                text: "Sign up",
                                 style: const TextStyle(
                                   color: Colors.black,
                                   fontSize: 16,
