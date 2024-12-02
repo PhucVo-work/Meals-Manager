@@ -19,7 +19,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Container(
       color: Colors.white,
       child: Padding(
-        padding: EdgeInsets.only(left: w *.07, right: w *.07, bottom: h * .022, top: h * .010),
+        padding: EdgeInsets.only(left: w *.04, right: w *.036, bottom: h * .022, top: h * .010),
         child: GNav(
           gap: 10,
           tabBorderRadius: 100,
@@ -33,13 +33,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
           tabs: const [
             GButton(icon: Icons.home_outlined, text: 'Home',),
             // GButton(icon: Icons.edit_note, text: 'Meal Plan',), phát triển trong tương lai
-            // GButton(icon: Icons.search_outlined, text:'Search'),
+            GButton(icon: Icons.search_outlined, text:'Search'),
             GButton(icon: Icons.favorite_border, text: 'Favorite recipe',),
-            GButton(icon: Icons.note_alt_rounded, text: 'Meal Recipe',),
-            GButton(icon: Icons.shopping_bag_outlined, text: 'Grocecy List',)
+            GButton(icon: Icons.note_alt_rounded, text: 'Meal plan',),
+            GButton(icon: Icons.shopping_bag_outlined, text: 'Grocery list',)
           ],
           onTabChange: widget.onTap,
-            selectedIndex: 0,
+          selectedIndex: widget.SelectedItem
         ),
       ),
     );

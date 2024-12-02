@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meals_manager/components/RecipeCard.dart';
+import 'package:meals_manager/router/app_router.dart';
 import '../components/api_service.dart';
 import 'package:lottie/lottie.dart';
 import '../constants/api_list.dart';
@@ -75,9 +76,16 @@ class TrendingRecipeState extends State<TrendingRecipe> {
             itemBuilder: (context, index) {
               final recipe = _carouselData[index];
               return RecipeCard(
-                recipe: recipe,
-                onSavePressed: () => _onSavePressed(recipe['name']),
-                onLikePressed: () => _onLikePressed(recipe['name']),
+                  recipe: recipe,
+                  onSavePressed: () => _onSavePressed(recipe['name']),
+                  onLikePressed: () => _onLikePressed(recipe['name']),
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.detailFoodRecipe,
+                      arguments: {'recipe': recipe},
+                    );
+                  }
               );
             },
           ),

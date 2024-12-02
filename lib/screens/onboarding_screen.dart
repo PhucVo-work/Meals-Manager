@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:meals_manager/constants/images_path.dart';
-import 'package:meals_manager/screens/home.dart';
+import 'package:meals_manager/router/app_router.dart';
 
 class OnBoardingScreen extends StatelessWidget {
   const OnBoardingScreen({super.key});
@@ -122,10 +122,7 @@ class OnBoardingScreen extends StatelessWidget {
                         height: h * .06,
                         child: OutlinedButton(
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context)=> const Home()),
-                            );
+                            Navigator.pushReplacementNamed(context, AppRoutes.home);
                           },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Color(0xFF8A47EB), width: 2),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meals_manager/router/app_router.dart';
 import '../components/api_service.dart';
 import 'package:lottie/lottie.dart';
 import '../constants/api_list.dart';
@@ -65,7 +66,6 @@ class CategoryRecipesState extends State<CategoryRecipes> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Categories', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              Text('See all', style: TextStyle(fontSize: 14, color: Colors.grey)),
             ],
           ),
         ),
@@ -125,72 +125,81 @@ class CategoryRecipesState extends State<CategoryRecipes> {
                 itemCount: _recipes.length,
                 itemBuilder: (context, index) {
                   final recipe = _recipes[index];
-                  return Container(
-                    width: 300,
-                    margin: const EdgeInsets.only(right: 10, top: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      image: DecorationImage(
-                        image: NetworkImage(recipe['image']),
-                        fit: BoxFit.cover,
+                  return GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.detailFoodRecipe,
+                        arguments: {'recipe': recipe},
+                      );
+                    },
+                    child: Container(
+                      width: 300,
+                      margin: const EdgeInsets.only(right: 10, top: 10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        image: DecorationImage(
+                          image: NetworkImage(recipe['image']),
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          bottom: 10,
-                          left: 10,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                            decoration: BoxDecoration(
-                              color: Colors.black54,
-                              borderRadius: BorderRadius.circular(8)
-                            ),
-                            child: Text(
-                              recipe['name'],
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            bottom: 10,
+                            left: 10,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.black54,
+                                borderRadius: BorderRadius.circular(8)
+                              ),
+                              child: Text(
+                                recipe['name'],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF8A47EB).withOpacity(0.6),
-                                borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(15),
-                                  bottomLeft: Radius.circular(15)
+                          Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF8A47EB).withOpacity(0.6),
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15)
+                                  ),
                                 ),
-                              ),
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                    onPressed: () => {/* hàm lưu cho 2 trường hợp*/},
-                                    icon: const Icon(
-                                      Icons.bookmark_border,
-                                      color: Colors.white,
+                                child: Row(
+                                  children: [
+                                    IconButton(
+                                      onPressed: () => {/* hàm lưu cho 2 trường hợp*/},
+                                      icon: const Icon(
+                                        Icons.bookmark_border,
+                                        color: Colors.white,
+                                      ),
+                                      iconSize: 30,
+                                      color: Colors.black.withOpacity(0.6),
                                     ),
-                                    iconSize: 30,
-                                    color: Colors.black.withOpacity(0.6),
-                                  ),
-                                  IconButton(
-                                    onPressed: () => {/* hàm yêu thích cho 2 trường hợp */},
-                                    icon: const Icon(
-                                      Icons.favorite_border,
-                                      color: Colors.white,
+                                    IconButton(
+                                      onPressed: () => {/* hàm yêu thích cho 2 trường hợp */},
+                                      icon: const Icon(
+                                        Icons.favorite_border,
+                                        color: Colors.white,
+                                      ),
+                                      iconSize: 30,
                                     ),
-                                    iconSize: 30,
-                                  ),
-                                ],
-                              ),
-                            )
-                        )
-                      ],
+                                  ],
+                                ),
+                              )
+                          )
+                        ],
+                      ),
                     ),
                   );
                 },

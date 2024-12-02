@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meals_manager/router/app_router.dart';
 import 'package:meals_manager/screens/onboarding_screen.dart';
+import 'package:meals_manager/screens/home_screen.dart';
+import 'package:meals_manager/screens/search_screen.dart';
 
-void main(){
+void main() {
   runApp(const MyApp());
 }
 
@@ -11,20 +14,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge); // Sử dụng chế độ edge-to-edge
+    // Cấu hình giao diện edge-to-edge
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent, // Thanh trạng thái trong suốt
-        systemNavigationBarColor: Colors.transparent, // Thanh điều hướng trong suốt
-        systemNavigationBarIconBrightness: Brightness.light, // Icon màu trắng
-        statusBarIconBrightness: Brightness.dark, // Icon thanh trạng thái màu trắng
+        statusBarColor: Colors.transparent,
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
       ),
     );
 
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: OnBoardingScreen(),
+      initialRoute: AppRoutes.onBoarding,
+      routes: routes,
     );
   }
 }
