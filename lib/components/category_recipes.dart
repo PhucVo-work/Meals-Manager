@@ -1,20 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:meals_manager/Model/recipe_model.dart';
 import 'package:meals_manager/router/app_router.dart';
 import '../components/api_service.dart';
 import 'package:lottie/lottie.dart';
 import '../constants/api_list.dart';
 import '../constants/images_path.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class CategoryRecipes extends StatefulWidget {
   @override
   CategoryRecipesState createState() => CategoryRecipesState();
 }
 
-
 class CategoryRecipesState extends State<CategoryRecipes> {
   final ApiService _apiService = ApiService();
   List<dynamic> _recipes = [];
   String currentApi = ApiList.breakfastApi;
+
+  final Box saveBox = Hive.box('Save');
+
+  // Hàm kiểm tra món ăn đã được lưu chưa
+  bool isSaved(int recipeId) {
+    return saveBox.containsKey(recipeId);
+  }
+
+  // Hàm xử lý khi nhấn lưu món ăn
+  void _onSavePressed(Map<String, dynamic> recipe) {
+    final newRecipe = Recipe(
+      id: recipe['id'],
+      name: recipe['name'],
+      ingredients: List<String>.from(recipe['ingredients']),
+      instructions: List<String>.from(recipe['instructions']),
+      prepTimeMinutes: recipe['prepTimeMinutes'],
+      cookTimeMinutes: recipe['cookTimeMinutes'],
+      servings: recipe['servings'],
+      difficulty: recipe['difficulty'],
+      cuisine: recipe['cuisine'],
+      caloriesPerServing: recipe['caloriesPerServing'],
+      tags: List<String>.from(recipe['tags']),
+      image: recipe['image'],
+      rating: recipe['rating'],
+      reviewCount: recipe['reviewCount'],
+      mealType: List<String>.from(recipe['mealType']),
+    );
+
+    if (!isSaved(recipe['id'])) {
+      saveBox.put(recipe['id'], newRecipe);
+      print('Recipe "${recipe['name']}" has been saved.');
+    } else {
+      saveBox.delete(recipe['id']);
+      print('Recipe "${recipe['name']}" has been removed from saved list.');
+    }
+  }
 
   @override
   void initState() {
@@ -175,26 +213,20 @@ class CategoryRecipesState extends State<CategoryRecipes> {
                                     bottomLeft: Radius.circular(15)
                                   ),
                                 ),
-                                child: Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () => {/* hàm lưu cho 2 trường hợp*/},
-                                      icon: const Icon(
-                                        Icons.bookmark_border,
+                                child: ValueListenableBuilder(
+                                  valueListenable: saveBox.listenable(),
+                                  builder: (context, Box box, _) {
+                                    bool saved = isSaved(recipe['id']);
+                                    return IconButton(
+                                      onPressed: () => _onSavePressed(recipe),
+                                      icon: Icon(
+                                        saved ? Icons.bookmark : Icons.bookmark_border,
                                         color: Colors.white,
                                       ),
                                       iconSize: 30,
                                       color: Colors.black.withOpacity(0.6),
-                                    ),
-                                    IconButton(
-                                      onPressed: () => {/* hàm yêu thích cho 2 trường hợp */},
-                                      icon: const Icon(
-                                        Icons.favorite_border,
-                                        color: Colors.white,
-                                      ),
-                                      iconSize: 30,
-                                    ),
-                                  ],
+                                    );
+                                  },
                                 ),
                               )
                           )

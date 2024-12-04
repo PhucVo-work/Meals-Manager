@@ -17,11 +17,31 @@ class HomeAppBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Hello', style: TextStyle(fontSize: w * 0.08 , fontWeight: FontWeight.w700),),
-              Text('What do you want to cook today', style: TextStyle(color: Colors.grey, fontSize:  w * 0.045),)
+              // chào tên của google của mình
+              Text('Hello, ', style: TextStyle(fontSize: w * 0.080, fontWeight: FontWeight.w700),),
+              Text('What do you want to cook today', style: TextStyle(color: Colors.grey, fontSize:  w * 0.04),)
             ],
           ),
-          const Icon(CupertinoIcons.profile_circled, size: 45,)
+          // xử lý toán tử 3 ngôi login true thì lấy cái Text và nguược lại
+          // 2 thằng đó đề c nhấn được và xử lý sự kiện đăng nhập và đăng xuất
+          Text(
+            'Log in',
+            style: TextStyle(
+              color:
+                const Color(0xFF8A47EB),
+                fontSize:  w * 0.045,
+                decoration: TextDecoration.underline,
+            )
+          ),
+          // Text(
+          //     'Log out',
+          //     style: TextStyle(
+          //       color:
+          //       const Color(0xFF8A47EB),
+          //       fontSize:  w * 0.045,
+          //       decoration: TextDecoration.underline,
+          //     )
+          // ),
         ],
       ),
     );

@@ -176,13 +176,23 @@ class OnBoardingScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8)
                             )
                           ),
-                          child: const Text(
-                            'Log in with google',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20
-                            ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image(
+                                image: AssetImage(ImagesPath.google_icon,),
+                                fit: BoxFit.cover,
+                              ),
+                              SizedBox(width: w * 0.04,),
+                              const Text(
+                                'Log in with google',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20
+                                ),
+                              ),
+                            ],
                           )),
                       ),
                       SizedBox(height: h * .016,),

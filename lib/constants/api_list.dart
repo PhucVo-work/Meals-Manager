@@ -6,5 +6,5 @@ class ApiList {
   static const String lunchApi = 'https://dummyjson.com/c/dfc7-028a-4d36-b892';
   static const String sideDishApi = 'https://dummyjson.com/c/c2fb-cb5e-4ef8-98ec';
   static const String snackApi = 'https://dummyjson.com/c/79a1-ee30-4ac7-a496';
-  static const String trendingRecipeApi = 'https://dummyjson.com/c/5c0b-4f49-48ae-8590';
+  static const String trendingRecipeApi = 'https://dummyjson.com/c/d31c-ace3-4610-abe4';
 }

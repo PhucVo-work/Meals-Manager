@@ -26,16 +26,14 @@ class _BottomNavBarState extends State<BottomNavBar> {
           backgroundColor: Colors.white,
           activeColor: const Color(0xFF7200b5),
           color: Colors.black,
-          tabBackgroundColor: Colors.purple.withOpacity(0.2),
+          tabBackgroundColor: const Color(0xFF8A47EB).withOpacity(0.2),
           iconSize: 38,
           textSize: 18,
-          padding: EdgeInsets.symmetric(horizontal: w * .01, vertical: h * .01),
+          padding: EdgeInsets.symmetric(horizontal: w * .028, vertical: h * .01),
           tabs: const [
             GButton(icon: Icons.home_outlined, text: 'Home',),
-            // GButton(icon: Icons.edit_note, text: 'Meal Plan',), phát triển trong tương lai
             GButton(icon: Icons.search_outlined, text:'Search'),
-            GButton(icon: Icons.favorite_border, text: 'Favorite recipe',),
-            GButton(icon: Icons.note_alt_rounded, text: 'Meal plan',),
+            GButton(icon: Icons.note_alt_rounded, text: 'Save meal',),
             GButton(icon: Icons.shopping_bag_outlined, text: 'Grocery list',)
           ],
           onTabChange: widget.onTap,

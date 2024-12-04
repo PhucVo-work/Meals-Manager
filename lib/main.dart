@@ -1,11 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:meals_manager/Model/ingredients_model.dart';
 import 'package:meals_manager/router/app_router.dart';
-import 'package:meals_manager/screens/onboarding_screen.dart';
-import 'package:meals_manager/screens/home_screen.dart';
-import 'package:meals_manager/screens/search_screen.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:meals_manager/service/ingredient_service.dart';
+import 'Model/recipe_model.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main()async{
+  WidgetsFlutterBinding.ensureInitialized();
+  final appDocumentDirectory = await getApplicationDocumentsDirectory();
+  Hive.init(appDocumentDirectory.path);
+
+  Hive.registerAdapter(RecipeAdapter());
+  Hive.registerAdapter(IngredientAdapter()); // Đăng ký adapter cho Ingredient
+
+  await Hive.initFlutter();
+  await Hive.openBox('Save');
+  await Hive.openBox<Ingredient>('ingredients'); // Box lưu nguyên liệu
+
+  // Khởi tạo service
+    final ingredientService = IngredientService();
+    await ingredientService.init();
+    await ingredientService.processIngredientsFromRecipes();
+
   runApp(const MyApp());
 }
 

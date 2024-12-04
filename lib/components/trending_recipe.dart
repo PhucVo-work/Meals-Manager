@@ -32,14 +32,6 @@ class TrendingRecipeState extends State<TrendingRecipe> {
     }
   }
 
-  void _onSavePressed(String recipeName) {
-    print("Saved recipe: $recipeName");
-  }
-
-  void _onLikePressed(String recipeName) {
-    print("Liked recipe: $recipeName");
-  }
-
   @override
   Widget build(BuildContext context) {
     final h = MediaQuery.of(context).size.height;
@@ -77,15 +69,6 @@ class TrendingRecipeState extends State<TrendingRecipe> {
               final recipe = _carouselData[index];
               return RecipeCard(
                   recipe: recipe,
-                  onSavePressed: () => _onSavePressed(recipe['name']),
-                  onLikePressed: () => _onLikePressed(recipe['name']),
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.detailFoodRecipe,
-                      arguments: {'recipe': recipe},
-                    );
-                  }
               );
             },
           ),

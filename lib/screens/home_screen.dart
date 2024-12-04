@@ -3,7 +3,6 @@ import 'package:meals_manager/components/category_recipes.dart';
 import 'package:meals_manager/components/home_app_bar.dart';
 import 'package:meals_manager/components/text_field_widget.dart';
 import 'package:meals_manager/components/trending_recipe.dart';
-import 'package:meals_manager/router/app_router.dart';
 
 class HomePage extends StatefulWidget {
   final Function(String) onSearch;
@@ -20,7 +19,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
-
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

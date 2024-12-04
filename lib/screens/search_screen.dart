@@ -48,9 +48,23 @@ class _SearchScreenState extends State<SearchScreen> {
       final allRecipes = data['recipes'];
 
       setState(() {
+        // Chuyển query về dạng chữ cái đầu viết hoa
+        final queryFormatted = query.trim().isNotEmpty
+            ? query[0].toUpperCase() + query.substring(1).toLowerCase()
+            : '';
+
         _recipes = allRecipes.where((recipe) {
-          final queryLower = query.toLowerCase();
-          return recipe['name'].toString().toLowerCase().contains(queryLower);
+          final name = recipe['name'].toString();
+          final tags = (recipe['tags'] as List).join(' ');
+          final cuisine = recipe['cuisine'].toString();
+          final mealType = (recipe['mealType'] as List).join(' ');
+          final ingredients = (recipe['ingredients'] as List).join(' ');
+
+          return name.contains(queryFormatted) ||
+              tags.contains(queryFormatted) ||
+              cuisine.contains(queryFormatted) ||
+              mealType.contains(queryFormatted) ||
+              ingredients.contains(queryFormatted);
         }).toList();
       });
     } catch (e) {
@@ -68,11 +82,20 @@ class _SearchScreenState extends State<SearchScreen> {
     final w = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Search Recipes")),
+      appBar: AppBar(
+        title: const Text(
+          "Search Recipes",
+          style: TextStyle(
+            fontWeight:  FontWeight.w800,
+            color: Colors.white
+          ),
+        ),
+        backgroundColor: const Color(0xFF7200b5).withOpacity(0.7),
+      ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
             child: TextFieldWidget(
               controller: _searchController,
               hintText: "Search recipes...",
@@ -95,7 +118,14 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 )
                 : _recipes.isEmpty
-                ? Center(child: Text("No results found for '${_searchController.text.trim()}'"))
+                ? Center(
+                  child: Lottie.asset(
+                    ImagesPath.ingredients,
+                    width: w * .80,
+                    height: h * .300,
+                    repeat: true,
+                  ),
+                )
                 : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
                   itemCount: _recipes.length,
@@ -104,16 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     return Padding(
                       padding: EdgeInsets.only(left: 5, bottom: h * .028),
                       child: RecipeCard(
-                        onTap: (){
-                          Navigator.pushNamed(
-                            context,
-                            AppRoutes.detailFoodRecipe,
-                            arguments: {'recipe': recipe},
-                          );
-                        },
                         recipe: recipe,
-                        onSavePressed: () => print("Saved ${recipe['name']}"),
-                        onLikePressed: () => print("Liked ${recipe['name']}"),
                         isSearchScreen: true,
                       ),
                     );

@@ -1,5 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:meals_manager/Model/recipe_model.dart';
 
 class DetailRecipeScreen extends StatelessWidget {
   final Map<String, dynamic> recipe;
@@ -10,6 +13,42 @@ class DetailRecipeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
+
+    final Box saveBox = Hive.box('Save');
+
+    // Hàm kiểm tra món ăn đã được lưu chưa
+    bool isSaved(int recipeId) {
+      return saveBox.containsKey(recipeId);
+    }
+
+    // Hàm xử lý khi nhấn lưu món ăn
+    void _onSavePressed(Map<String, dynamic> recipe) {
+      final newRecipe = Recipe(
+        id: recipe['id'],
+        name: recipe['name'],
+        ingredients: List<String>.from(recipe['ingredients']),
+        instructions: List<String>.from(recipe['instructions']),
+        prepTimeMinutes: recipe['prepTimeMinutes'],
+        cookTimeMinutes: recipe['cookTimeMinutes'],
+        servings: recipe['servings'],
+        difficulty: recipe['difficulty'],
+        cuisine: recipe['cuisine'],
+        caloriesPerServing: recipe['caloriesPerServing'],
+        tags: List<String>.from(recipe['tags']),
+        image: recipe['image'],
+        rating: recipe['rating'],
+        reviewCount: recipe['reviewCount'],
+        mealType: List<String>.from(recipe['mealType']),
+      );
+
+      if (!isSaved(recipe['id'])) {
+        saveBox.put(recipe['id'], newRecipe);
+        print('Recipe "${recipe['name']}" has been saved.');
+      } else {
+        saveBox.delete(recipe['id']);
+        print('Recipe "${recipe['name']}" has been removed from saved list.');
+      }
+    }
 
     final List<Map<String, dynamic>> details = [
       {'icon': Icons.restaurant, 'text': '${recipe['servings']} servings'},
@@ -215,13 +254,13 @@ class DetailRecipeScreen extends StatelessWidget {
                             ...List.generate(
                               recipe['instructions'].length,
                                   (index) => Padding(
-                                padding: EdgeInsets.only(left: 20, bottom: h * 0.018),
+                                padding: EdgeInsets.only(left: 10, bottom: h * 0.020),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '${index + 1}.', // The index/step number
+                                      'Step ${index + 1}.', // The index/step number
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 21,
@@ -257,21 +296,24 @@ class DetailRecipeScreen extends StatelessWidget {
             bottom: 40,
             child: Column(
               children: [
-                FloatingActionButton(
-                  heroTag: 'save',
-                  onPressed: () {
-                    // Thêm sự kiện save tại đây
+                // Nút Save
+                ValueListenableBuilder(
+                  valueListenable: saveBox.listenable(),
+                  builder: (context, Box box, _) {
+                    final saved = isSaved(recipe['id']);
+                    return FloatingActionButton(
+                      heroTag: 'save',
+                      onPressed: () => _onSavePressed(recipe),
+                      backgroundColor: const Color(0xFF8A47EB) ,
+                      child: Icon(
+                        saved ? Icons.bookmark : Icons.bookmark_border,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    );
                   },
-                  child: const Icon(Icons.bookmark,),
                 ),
                 const SizedBox(height: 16),
-                FloatingActionButton(
-                  heroTag: 'heart',
-                  onPressed: () {
-                    // Thêm sự kiện heart tại đây
-                  },
-                  child: const Icon(Icons.favorite, color: Colors.redAccent,),
-                ),
               ],
             ),
           ),
