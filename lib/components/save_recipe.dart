@@ -13,6 +13,7 @@ class SaveRecipe extends StatefulWidget {
 }
 
 class _SaveRecipeState extends State<SaveRecipe> {
+
   void _deleteRecipe() async {
     // Xóa công thức khỏi Hive box
     final box = await Hive.openBox('Save'); // Thay 'recipes' bằng tên Hive box của bạn

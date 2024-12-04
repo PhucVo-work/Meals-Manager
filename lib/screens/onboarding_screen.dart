@@ -2,6 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:meals_manager/constants/images_path.dart';
 import 'package:meals_manager/router/app_router.dart';
+import 'package:meals_manager/components//auth_service.dart';
+import 'home.dart';
 
 class OnBoardingScreen extends StatelessWidget {
   const OnBoardingScreen({super.key});
@@ -11,6 +13,21 @@ class OnBoardingScreen extends StatelessWidget {
     final h = MediaQuery.of(context).size.height;
     final w = MediaQuery.of(context).size.width;
 
+    Future<void> _handleGoogleSignIn() async {
+      final user = await AuthService.signInWithGoogle();
+      if (user != null) {
+        // Chuyển đến màn hình Home nếu đăng nhập thành công
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Home()),
+        );
+      } else {
+        // Hiển thị thông báo lỗi hoặc xử lý thêm nếu cần
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Đăng nhập thất bại. Vui lòng thử lại.")),
+        );
+      }
+    }
     return Scaffold(
       body: SizedBox(
         height: h,
@@ -176,23 +193,37 @@ class OnBoardingScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8)
                             )
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image(
-                                image: AssetImage(ImagesPath.google_icon,),
-                                fit: BoxFit.cover,
-                              ),
-                              SizedBox(width: w * 0.04,),
-                              const Text(
-                                'Log in with google',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20
+                          child: SizedBox(
+                            width: w * .88,
+                            height: h * .06,
+                            child: OutlinedButton(
+                              onPressed: _handleGoogleSignIn,
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: const Color(0xFFF8A47EB),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
+                                side: const BorderSide(color: Color(0xFFF8A47EB), width: 1),
                               ),
-                            ],
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image(
+                                    image: AssetImage(ImagesPath.google_icon,),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  SizedBox(width: w * 0.04,),
+                                  const Text(
+                                    'Log in with google',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           )),
                       ),
                       SizedBox(height: h * .016,),

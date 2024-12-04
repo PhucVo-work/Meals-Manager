@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meals_manager/Model/ingredients_model.dart';
@@ -24,6 +25,8 @@ void main()async{
     await ingredientService.init();
     await ingredientService.processIngredientsFromRecipes();
 
+  //firebase login
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

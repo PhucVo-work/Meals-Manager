@@ -1,4 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.meals_manager">
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="meals_manager"
         android:name="${applicationName}"
