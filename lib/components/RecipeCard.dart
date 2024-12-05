@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:meals_manager/Model/recipe_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:meals_manager/components/convertToJson.dart';
 import 'package:meals_manager/router/app_router.dart';
 import 'package:meals_manager/service/ingredient_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RecipeCard extends StatelessWidget {
   final bool isSearchScreen;
@@ -27,8 +31,38 @@ class RecipeCard extends StatelessWidget {
       return saveBox.containsKey(recipeId);
     }
 
-    // Hàm xử lý khi nhấn lưu món ăn
-    void _onSavePressed(Map<String, dynamic> recipe) {
+    // // Hàm xử lý khi nhấn lưu món ăn
+    // void _onSavePressed(Map<String, dynamic> recipe) {
+    //   final newRecipe = Recipe(
+    //     id: recipe['id'],
+    //     name: recipe['name'],
+    //     ingredients: List<String>.from(recipe['ingredients']),
+    //     instructions: List<String>.from(recipe['instructions']),
+    //     prepTimeMinutes: recipe['prepTimeMinutes'],
+    //     cookTimeMinutes: recipe['cookTimeMinutes'],
+    //     servings: recipe['servings'],
+    //     difficulty: recipe['difficulty'],
+    //     cuisine: recipe['cuisine'],
+    //     caloriesPerServing: recipe['caloriesPerServing'],
+    //     tags: List<String>.from(recipe['tags']),
+    //     image: recipe['image'],
+    //     rating: recipe['rating'],
+    //     reviewCount: recipe['reviewCount'],
+    //     mealType: List<String>.from(recipe['mealType']),
+    //   );
+    //
+    //   // Nếu món ăn chưa lưu, thì lưu vào Hive
+    //   if (!isSaved(recipe['id'])) {
+    //     saveBox.put(recipe['id'], newRecipe);
+    //     print('Recipe "${recipe['name']}" has been saved.');
+    //   } else {
+    //     // Nếu món ăn đã lưu, có thể xóa khỏi Hive
+    //     saveBox.delete(recipe['id']);
+    //     print('Recipe "${recipe['name']}" has been removed from saved list.');
+    //   }
+    // }
+
+    void _onSavePressed(Map<String, dynamic> recipe) async {
       final newRecipe = Recipe(
         id: recipe['id'],
         name: recipe['name'],
@@ -47,14 +81,28 @@ class RecipeCard extends StatelessWidget {
         mealType: List<String>.from(recipe['mealType']),
       );
 
-      // Nếu món ăn chưa lưu, thì lưu vào Hive
-      if (!isSaved(recipe['id'])) {
+      final saveBox = Hive.box('Save');
+      final user = FirebaseAuth.instance.currentUser;
+
+      // Nếu người dùng chưa đăng nhập
+      if (user == null) {
+        // Lưu vào Hive
         saveBox.put(recipe['id'], newRecipe);
-        print('Recipe "${recipe['name']}" has been saved.');
+        print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ.');
       } else {
-        // Nếu món ăn đã lưu, có thể xóa khỏi Hive
-        saveBox.delete(recipe['id']);
-        print('Recipe "${recipe['name']}" has been removed from saved list.');
+        // Nếu người dùng đã đăng nhập, lưu vào cả Hive và Firestore
+        saveBox.put(recipe['id'], newRecipe);
+
+        // Lưu lên Firestore
+        final uid = user.uid;
+        final userRecipesRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('recipes');
+
+        // Tải công thức lên Firestore
+        await userRecipesRef.doc(recipe['id'].toString()).set(convertRecipeToJson(newRecipe));
+        print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ và Firestore.');
       }
     }
 

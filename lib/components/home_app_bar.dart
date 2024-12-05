@@ -69,7 +69,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
             children: [
               Text(
                 'Hello, ${_user != null ? _user!.displayName : ""}',
-                style: TextStyle(fontSize: w * 0.08, fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: w * 0.065, fontWeight: FontWeight.w700),
               ),
               Text(
                 'What do you want to cook today',
@@ -79,10 +79,15 @@ class _HomeAppBarState extends State<HomeAppBar> {
           ),
           // Xử lý dropdown menu cho icon
           PopupMenuButton<String>(
-            icon: Icon(
+            icon: _user != null && _user!.photoURL != null
+                ? CircleAvatar(
+                  radius: w * 0.065,
+                  backgroundImage: NetworkImage(_user!.photoURL!),
+            )
+                : Icon(
               _user == null
                   ? Icons.login // Biểu tượng login
-                  : CupertinoIcons.person_circle_fill, // Biểu tượng account
+                  : CupertinoIcons.person_circle_fill, // Biểu tượng account mặc định
               size: w * 0.08,
               color: const Color(0xFF8A47EB),
             ),
