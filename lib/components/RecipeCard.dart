@@ -84,27 +84,35 @@ class RecipeCard extends StatelessWidget {
       final saveBox = Hive.box('Save');
       final user = FirebaseAuth.instance.currentUser;
 
-      // Nếu người dùng chưa đăng nhập
+      // Nếu người dùng chưa đăng nhập, chỉ lưu vào Hive
       if (user == null) {
-        // Lưu vào Hive
         saveBox.put(recipe['id'], newRecipe);
         print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ.');
-      } else {
-        // Nếu người dùng đã đăng nhập, lưu vào cả Hive và Firestore
+        return;
+      }
+
+      final uid = user.uid;
+      final userRecipesRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('recipes');
+
+      try {
+        // Lưu dữ liệu vào Hive trước
         saveBox.put(recipe['id'], newRecipe);
 
-        // Lưu lên Firestore
-        final uid = user.uid;
-        final userRecipesRef = FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .collection('recipes');
+        // Lưu dữ liệu lên Firestore (Firestore tự tạo collection và document nếu chưa tồn tại)
+        await userRecipesRef.doc(recipe['id'].toString()).set(
+          convertRecipeToJson(newRecipe),
+          SetOptions(merge: true), // Merge để tránh ghi đè dữ liệu cũ
+        );
 
-        // Tải công thức lên Firestore
-        await userRecipesRef.doc(recipe['id'].toString()).set(convertRecipeToJson(newRecipe));
-        print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ và Firestore.');
+        print('Công thức "${recipe['name']}" đã được lưu vào Firestore và bộ nhớ cục bộ.');
+      } catch (e) {
+        print('Lỗi khi lưu công thức lên Firestore: $e');
       }
     }
+
 
 
     return GestureDetector(

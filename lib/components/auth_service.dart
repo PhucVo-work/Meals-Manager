@@ -1,40 +1,48 @@
-import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final GoogleSignIn _googleSignIn = GoogleSignIn();
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Hàm đăng nhập bằng Google
+  // Đăng nhập với Google (luôn hiển thị tùy chọn tài khoản)
   static Future<User?> signInWithGoogle() async {
     try {
-      // Đăng nhập bằng Google và yêu cầu người dùng chọn tài khoản
+      // Đăng xuất trước để buộc hiển thị hộp thoại chọn tài khoản
+      await _googleSignIn.signOut();
+
+      // Đăng nhập Google
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        // Người dùng hủy đăng nhập
+        print("Người dùng đã hủy đăng nhập.");
         return null;
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+      await googleUser.authentication;
 
-      // Tạo credential
+      // Xác thực với Firebase
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-
-      // Đăng nhập vào Firebase
-      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final UserCredential userCredential =
+      await _auth.signInWithCredential(credential);
       final User? user = userCredential.user;
 
-      // Lưu thông tin người dùng vào Firestore
       if (user != null) {
-        await _saveUserToFirestore(user);
+        // Lưu thông tin người dùng vào Firestore
+        await _firestore.collection('users').doc(user.uid).set({
+          'uid': user.uid,
+          'email': user.email,
+          'displayName': user.displayName,
+          'photoURL': user.photoURL,
+          'lastLogin': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true)); // Merge để tránh ghi đè
+        print("Thông tin người dùng đã được lưu vào Firestore!");
       }
-
       return user;
     } catch (e) {
       print("Lỗi khi đăng nhập: $e");
@@ -42,33 +50,7 @@ class AuthService {
     }
   }
 
-  // Lưu người dùng vào Firestore
-  static Future<void> _saveUserToFirestore(User user) async {
-    final DocumentReference userDoc = _firestore.collection('users').doc(user.uid);
-
-    // Kiểm tra xem document đã tồn tại chưa
-    final DocumentSnapshot userSnapshot = await userDoc.get();
-    if (!userSnapshot.exists) {
-      // Tạo mới document nếu chưa tồn tại
-      await userDoc.set({
-        'uid': user.uid,
-        'email': user.email,
-        'displayName': user.displayName,
-        'photoURL': user.photoURL,
-        'createdAt': FieldValue.serverTimestamp(),
-        'lastLogin': FieldValue.serverTimestamp(),
-        'uids': [user.uid], // Mảng chứa UID, ban đầu chỉ có UID này
-      });
-    } else {
-      // Cập nhật `lastLogin` và thêm UID vào mảng `uids` nếu document đã tồn tại
-      await userDoc.update({
-        'lastLogin': FieldValue.serverTimestamp(),
-        'uids': FieldValue.arrayUnion([user.uid]), // Thêm UID vào mảng `uids`
-      });
-    }
-  }
-
-  // Hàm đăng xuất
+  // Đăng xuất
   static Future<void> signOut() async {
     await _auth.signOut();
     await _googleSignIn.signOut();
