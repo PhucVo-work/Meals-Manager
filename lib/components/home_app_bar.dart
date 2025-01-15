@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive/hive.dart';
 
 class HomeAppBar extends StatefulWidget {
   const HomeAppBar({super.key});
@@ -19,6 +21,45 @@ class _HomeAppBarState extends State<HomeAppBar> {
   void initState() {
     super.initState();
     _checkUserLoginStatus();
+  }
+
+  Future<void> syncHiveBox() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final uid = user.uid;
+      final userRecipesRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('recipes');
+
+      try {
+        // Lấy dữ liệu từ Firestore
+        final querySnapshot = await userRecipesRef.get();
+        final box = await Hive.openBox('Save');
+
+        // Tạo một danh sách chứa tất cả công thức từ Firestore
+        final List<Map<String, dynamic>> recipes = querySnapshot.docs.map((doc) {
+          final data = doc.data();
+          return {
+            'id': doc.id, // Bao gồm cả ID nếu cần
+            ...data, // Thêm các thuộc tính từ Firestore
+          };
+        }).toList();
+
+        // Xóa dữ liệu cũ trong Hive box
+        await box.clear();
+
+        // Ghi đè danh sách mới từ Firestore vào Hive box 'Save'
+        await box.put('recipes', recipes);
+
+        print('Đồng bộ Hive box "Save" với Firestore thành công.');
+      } catch (e) {
+        print('Lỗi khi đồng bộ Hive box "Save": $e');
+      }
+    } else {
+      print('Người dùng chưa đăng nhập, không thực hiện đồng bộ Hive box.');
+    }
   }
 
   // Kiểm tra trạng thái đăng nhập của người dùng

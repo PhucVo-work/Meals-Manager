@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:meals_manager/constants/images_path.dart';
 import 'package:meals_manager/router/app_router.dart';
@@ -106,8 +105,8 @@ class OnBoardingScreen extends StatelessWidget {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(38),
-                    topLeft: Radius.circular(38)
+                    topRight: Radius.circular(0),
+                    topLeft: Radius.circular(0)
                   )
                 ),
                 child: Padding(
@@ -224,35 +223,9 @@ class OnBoardingScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                          )),
+                          )
+                        ),
                       ),
-                      SizedBox(height: h * .016,),
-                      SizedBox(
-                        child: RichText(
-                          text: TextSpan(
-                            text: "Create a new acount? ",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: "Sign up",
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    // mốt xử lý sự kiện
-                                  },
-                              ),
-                            ],
-                          ),
-                        )
-                      )
                     ],
                   ),
                 ),

@@ -5,8 +5,8 @@ import 'package:meals_manager/Model/recipe_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:meals_manager/components/convertToJson.dart';
 import 'package:meals_manager/router/app_router.dart';
-import 'package:meals_manager/service/ingredient_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:meals_manager/service/ingredient_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RecipeCard extends StatelessWidget {
@@ -31,37 +31,6 @@ class RecipeCard extends StatelessWidget {
       return saveBox.containsKey(recipeId);
     }
 
-    // // Hàm xử lý khi nhấn lưu món ăn
-    // void _onSavePressed(Map<String, dynamic> recipe) {
-    //   final newRecipe = Recipe(
-    //     id: recipe['id'],
-    //     name: recipe['name'],
-    //     ingredients: List<String>.from(recipe['ingredients']),
-    //     instructions: List<String>.from(recipe['instructions']),
-    //     prepTimeMinutes: recipe['prepTimeMinutes'],
-    //     cookTimeMinutes: recipe['cookTimeMinutes'],
-    //     servings: recipe['servings'],
-    //     difficulty: recipe['difficulty'],
-    //     cuisine: recipe['cuisine'],
-    //     caloriesPerServing: recipe['caloriesPerServing'],
-    //     tags: List<String>.from(recipe['tags']),
-    //     image: recipe['image'],
-    //     rating: recipe['rating'],
-    //     reviewCount: recipe['reviewCount'],
-    //     mealType: List<String>.from(recipe['mealType']),
-    //   );
-    //
-    //   // Nếu món ăn chưa lưu, thì lưu vào Hive
-    //   if (!isSaved(recipe['id'])) {
-    //     saveBox.put(recipe['id'], newRecipe);
-    //     print('Recipe "${recipe['name']}" has been saved.');
-    //   } else {
-    //     // Nếu món ăn đã lưu, có thể xóa khỏi Hive
-    //     saveBox.delete(recipe['id']);
-    //     print('Recipe "${recipe['name']}" has been removed from saved list.');
-    //   }
-    // }
-
     void _onSavePressed(Map<String, dynamic> recipe) async {
       final newRecipe = Recipe(
         id: recipe['id'],
@@ -84,13 +53,20 @@ class RecipeCard extends StatelessWidget {
       final saveBox = Hive.box('Save');
       final user = FirebaseAuth.instance.currentUser;
 
-      // Nếu người dùng chưa đăng nhập, chỉ lưu vào Hive
+      // Kiểm tra nếu người dùng đã đăng nhập
       if (user == null) {
-        saveBox.put(recipe['id'], newRecipe);
-        print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ.');
-        return;
+        // Nếu người dùng chưa đăng nhập, chỉ lưu/xóa vào Hive
+        if (!isSaved(recipe['id'])) {
+          saveBox.put(recipe['id'], newRecipe); // Lưu công thức vào Hive
+          print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ.');
+        } else {
+          saveBox.delete(recipe['id']); // Xóa công thức khỏi Hive
+          print('Công thức "${recipe['name']}" đã được xóa khỏi bộ nhớ cục bộ.');
+        }
+        return; // Nếu chưa đăng nhập thì không thực hiện lưu/xóa trên Firestore
       }
 
+      // Nếu người dùng đã đăng nhập, xử lý lưu/xóa ở Firestore
       final uid = user.uid;
       final userRecipesRef = FirebaseFirestore.instance
           .collection('users')
@@ -98,22 +74,32 @@ class RecipeCard extends StatelessWidget {
           .collection('recipes');
 
       try {
-        // Lưu dữ liệu vào Hive trước
-        saveBox.put(recipe['id'], newRecipe);
+        // Lưu/xóa vào Hive trước
+        if (!isSaved(recipe['id'])) {
+          saveBox.put(recipe['id'], newRecipe); // Lưu công thức vào Hive
+          print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ.');
+        } else {
+          saveBox.delete(recipe['id']); // Xóa công thức khỏi Hive
+          print('Công thức "${recipe['name']}" đã được xóa khỏi bộ nhớ cục bộ.');
+        }
 
-        // Lưu dữ liệu lên Firestore (Firestore tự tạo collection và document nếu chưa tồn tại)
-        await userRecipesRef.doc(recipe['id'].toString()).set(
-          convertRecipeToJson(newRecipe),
-          SetOptions(merge: true), // Merge để tránh ghi đè dữ liệu cũ
-        );
-
-        print('Công thức "${recipe['name']}" đã được lưu vào Firestore và bộ nhớ cục bộ.');
+        // Lưu hoặc xóa dữ liệu trên Firestore nếu đã đăng nhập
+        if (!isSaved(recipe['id'])) {
+          // Xóa công thức khỏi Firestore
+          await userRecipesRef.doc(recipe['id'].toString()).delete();
+          print('Công thức "${recipe['name']}" đã được xóa khỏi Firestore.');
+        } else {
+          // Lưu công thức vào Firestore
+          await userRecipesRef.doc(recipe['id'].toString()).set(
+            convertRecipeToJson(newRecipe),
+            SetOptions(merge: true),
+          );
+          print('Công thức "${recipe['name']}" đã được lưu vào Firestore.');
+        }
       } catch (e) {
-        print('Lỗi khi lưu công thức lên Firestore: $e');
+        print('Lỗi khi lưu/xóa công thức lên Firestore: $e');
       }
     }
-
-
 
     return GestureDetector(
       onTap: () => {

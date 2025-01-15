@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meals_manager/Model/recipe_model.dart';
+import 'package:meals_manager/components/convertToJson.dart';
 import 'package:meals_manager/router/app_router.dart';
 import '../components/api_service.dart';
 import 'package:lottie/lottie.dart';
@@ -25,8 +28,7 @@ class CategoryRecipesState extends State<CategoryRecipes> {
     return saveBox.containsKey(recipeId);
   }
 
-  // Hàm xử lý khi nhấn lưu món ăn
-  void _onSavePressed(Map<String, dynamic> recipe) {
+  void _onSavePressed(Map<String, dynamic> recipe) async {
     final newRecipe = Recipe(
       id: recipe['id'],
       name: recipe['name'],
@@ -45,12 +47,54 @@ class CategoryRecipesState extends State<CategoryRecipes> {
       mealType: List<String>.from(recipe['mealType']),
     );
 
-    if (!isSaved(recipe['id'])) {
-      saveBox.put(recipe['id'], newRecipe);
-      print('Recipe "${recipe['name']}" has been saved.');
-    } else {
-      saveBox.delete(recipe['id']);
-      print('Recipe "${recipe['name']}" has been removed from saved list.');
+    final saveBox = Hive.box('Save');
+    final user = FirebaseAuth.instance.currentUser;
+
+    // Kiểm tra nếu người dùng đã đăng nhập
+    if (user == null) {
+      // Nếu người dùng chưa đăng nhập, chỉ lưu/xóa vào Hive
+      if (!isSaved(recipe['id'])) {
+        saveBox.put(recipe['id'], newRecipe); // Lưu công thức vào Hive
+        print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ.');
+      } else {
+        saveBox.delete(recipe['id']); // Xóa công thức khỏi Hive
+        print('Công thức "${recipe['name']}" đã được xóa khỏi bộ nhớ cục bộ.');
+      }
+      return; // Nếu chưa đăng nhập thì không thực hiện lưu/xóa trên Firestore
+    }
+
+    // Nếu người dùng đã đăng nhập, xử lý lưu/xóa ở Firestore
+    final uid = user.uid;
+    final userRecipesRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('recipes');
+
+    try {
+      // Lưu/xóa vào Hive trước
+      if (!isSaved(recipe['id'])) {
+        saveBox.put(recipe['id'], newRecipe); // Lưu công thức vào Hive
+        print('Công thức "${recipe['name']}" đã được lưu vào bộ nhớ cục bộ.');
+      } else {
+        saveBox.delete(recipe['id']); // Xóa công thức khỏi Hive
+        print('Công thức "${recipe['name']}" đã được xóa khỏi bộ nhớ cục bộ.');
+      }
+
+      // Lưu hoặc xóa dữ liệu trên Firestore nếu đã đăng nhập
+      if (!isSaved(recipe['id'])) {
+        // Xóa công thức khỏi Firestore
+        await userRecipesRef.doc(recipe['id'].toString()).delete();
+        print('Công thức "${recipe['name']}" đã được xóa khỏi Firestore.');
+      } else {
+        // Lưu công thức vào Firestore
+        await userRecipesRef.doc(recipe['id'].toString()).set(
+          convertRecipeToJson(newRecipe),
+          SetOptions(merge: true),
+        );
+        print('Công thức "${recipe['name']}" đã được lưu vào Firestore.');
+      }
+    } catch (e) {
+      print('Lỗi khi lưu/xóa công thức lên Firestore: $e');
     }
   }
 
@@ -70,6 +114,7 @@ class CategoryRecipesState extends State<CategoryRecipes> {
       print('Error fetching recipes: $e');
     }
   }
+
 
   void _updateCategory(String apiUrl) {
     setState(() {

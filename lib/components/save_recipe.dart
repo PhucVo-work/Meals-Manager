@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meals_manager/Model/recipe_model.dart';
 import 'package:hive/hive.dart';
 import 'package:meals_manager/router/app_router.dart';
 import 'package:meals_manager/components/convertToJson.dart';
+
 
 class SaveRecipe extends StatefulWidget {
   final Recipe recipe; // Tham chiếu đến model Recipe
@@ -14,12 +17,35 @@ class SaveRecipe extends StatefulWidget {
 
 class _SaveRecipeState extends State<SaveRecipe> {
 
+
   void _deleteRecipe() async {
-    // Xóa công thức khỏi Hive box
-    final box = await Hive.openBox('Save'); // Thay 'recipes' bằng tên Hive box của bạn
-    box.delete(widget.recipe.id); // Sử dụng ID để xóa chính xác
+    final box = await Hive.openBox('Save'); // Mở Hive box 'Save'
+    final user = FirebaseAuth.instance.currentUser; // Lấy thông tin người dùng hiện tại
+
+    try {
+      // Nếu người dùng đã đăng nhập
+      if (user != null) {
+        final uid = user.uid; // ID người dùng
+        final userRecipesRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('recipes'); // Tham chiếu tới Firestore
+
+        // Xóa công thức khỏi Firestore
+        await userRecipesRef.doc(widget.recipe.id.toString()).delete();
+        print('Công thức "${widget.recipe.name}" đã được xóa khỏi Firestore.');
+      }
+
+      // Xóa công thức khỏi Hive
+      box.delete(widget.recipe.id);
+      print('Công thức "${widget.recipe.name}" đã được xóa khỏi Hive.');
+    } catch (e) {
+      print('Lỗi khi xóa công thức: $e');
+    }
+
     setState(() {}); // Cập nhật UI sau khi xóa
   }
+
 
   @override
   Widget build(BuildContext context) {
