@@ -76,3 +76,5 @@ flutter run
 ## Contact 📧
 
 For questions or suggestions, feel free to reach out:
+* **Email:** Phuc111239@gmail.com
+* **GitHub:** [Your GitHub Profile]([https://github.com/yourusername](https://github.com/PhucVo-work))
