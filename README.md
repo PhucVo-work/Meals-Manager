@@ -17,20 +17,20 @@ samples, guidance on mobile development, and a full API reference.
 
 ## Screenshots 📸
 
-### Home Screen
+### Login Screen
 ![Home Screen](assets/Picture1.jpg)
 
-### Recipe Details 
-![Recipe Details](assets/Picture2.jpg)
+### Home Screen
+![Home Screen](assets/Picture2.jpg)
 
-### Shopping List
+### Search Screen
 ![Shopping List](assets/Picture3.jpg)
 
 ### Favorites Screen
 ![Favorites Screen](assets/Picture4.jpg)
 
-### Login with Google
+### Detail Screen
 ![Login Screen](assets/Picture5.jpg)
 
-### Responsive Design
+### Ingredients Screen
 ![Responsive Layout](assets/Picture6.jpg)
