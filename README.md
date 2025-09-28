@@ -71,7 +71,7 @@ flutter run
 - **State Management:** Provider
 - **Backend:** Firebase
 - **Authentication:** Firebase Auth
-- **Database:** Cloud Firestore
+- **Database:** Cloud Firestore, Hive
 
 ## Contact 📧
 
